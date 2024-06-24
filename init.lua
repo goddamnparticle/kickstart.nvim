@@ -237,6 +237,8 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
       vim.keymap.set('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
       vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' })
+      vim.keymap.set('n', '<leader>si', builtin.lsp_incoming_calls, { desc = '[S]earch Lsp [I]ncomming Calls' })
+      vim.keymap.set('n', '<leader>so', builtin.lsp_outgoing_calls, { desc = '[S]earch Lsp [O]utgoing Calls' })
 
       -- Slightly advanced example of overriding default behavior and theme
       vim.keymap.set('n', '<leader>/', function()
