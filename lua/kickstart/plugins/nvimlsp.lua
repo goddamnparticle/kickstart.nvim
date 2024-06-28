@@ -171,6 +171,8 @@ return { -- LSP Configuration & Plugins
           '--completion-style=bundled',
           '--cross-file-rename',
           '--header-insertion=iwyu',
+          -- make clangd report more logs
+          -- '--log=verbose',
         },
       },
       -- gopls = {},
