@@ -243,6 +243,8 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' })
       vim.keymap.set('n', '<leader>si', builtin.lsp_incoming_calls, { desc = '[S]earch Lsp [I]ncomming Calls' })
       vim.keymap.set('n', '<leader>so', builtin.lsp_outgoing_calls, { desc = '[S]earch Lsp [O]utgoing Calls' })
+      vim.keymap.set('n', '<leader>st', builtin.lsp_type_definitions, { desc = '[S]earch Lsp [T]ype Definitions' })
+      vim.keymap.set('n', '<leader>sy', builtin.lsp_dynamic_workspace_symbols, { desc = '[S]earch Lsp Workspace S[y]mbols' })
 
       -- Slightly advanced example of overriding default behavior and theme
       vim.keymap.set('n', '<leader>/', function()
@@ -311,7 +313,49 @@ require('lazy').setup({
       --  - va)  - [V]isually select [A]round [)]paren
       --  - yinq - [Y]ank [I]nside [N]ext [']quote
       --  - ci'  - [C]hange [I]nside [']quote
-      require('mini.ai').setup { n_lines = 500 }
+      local spec_treesitter = require'mini.ai'.gen_spec.treesitter
+      require('mini.ai').setup {
+        custom_textobjects = {
+          -- a = mapped to args by mini.ai
+          f = spec_treesitter({
+            a = '@function.outer',
+            i = '@function.inner',
+          }),
+          -- u = spec_treesitter({
+          --    a = '@class.outer',
+          --    i = '@class.outer', -- only outer is available
+          -- }),
+          -- j = spec_treesitter({
+          --   a = '@loop.outer',
+          --   i = '@loop.inner',
+          -- }),
+          -- o = spec_treesitter({
+          --   a = '@block.outer',
+          --   i = '@block.inner',
+          -- }),
+          -- r = spec_treesitter({
+          --   a = '@parameter.outer',
+          --   i = '@parameter.inner',
+          -- }),
+          -- i = spec_treesitter({
+          --   a = '@conditional.outer',
+          --   i = '@conditional.inner',
+          -- }),
+          -- m = spec_treesitter({
+          --   a = '@comment.outer',
+          --   i = '@comment.outer', -- only outer is available
+          -- }),
+          -- c = spec_treesitter({
+          --   a = '@call.outer',
+          --   i = '@call.inner',
+          -- }),
+          -- d = spec_treesitter({
+          --   a = '@statement.outer',
+          --   i = '@statement.inner',
+          -- }),
+        },
+        n_lines = 1000,
+      }
 
       -- Add/delete/replace surroundings (brackets, quotes, etc.)
       --
@@ -354,6 +398,9 @@ require('lazy').setup({
         additional_vim_regex_highlighting = { 'ruby' },
       },
       indent = { enable = true, disable = { 'ruby' } },
+    },
+    dependencies = {
+      "nvim-treesitter/nvim-treesitter-textobjects",
     },
     config = function(_, opts)
       -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
