@@ -36,6 +36,7 @@ return { -- Autoformat
     --   }
     -- end,
     formatters_by_ft = {
+      bash = {'bashls'},
       lua = { 'cstylua' },
       -- Conform will run multiple formatters sequentially
       python = { 'isort', 'black' },

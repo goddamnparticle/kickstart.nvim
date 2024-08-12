@@ -154,19 +154,26 @@ require('lazy').setup({
       require('which-key').setup()
 
       -- Document existing key chains
-      require('which-key').register {
-        ['<leader>c'] = { name = '[C]ode', _ = 'which_key_ignore' },
-        ['<leader>d'] = { name = '[D]ocument', _ = 'which_key_ignore' },
-        ['<leader>r'] = { name = '[R]ename', _ = 'which_key_ignore' },
-        ['<leader>s'] = { name = '[S]earch', _ = 'which_key_ignore' },
-        ['<leader>w'] = { name = '[W]orkspace', _ = 'which_key_ignore' },
-        ['<leader>t'] = { name = '[T]oggle', _ = 'which_key_ignore' },
-        ['<leader>h'] = { name = 'Git [H]unk', _ = 'which_key_ignore' },
+      require('which-key').add {
+        { "<leader>c", group = "[C]ode" },
+        { "<leader>c_", hidden = true },
+        { "<leader>d", group = "[D]ocument" },
+        { "<leader>d_", hidden = true },
+        { "<leader>h", group = "Git [H]unk" },
+        { "<leader>h_", hidden = true },
+        { "<leader>r", group = "[R]ename" },
+        { "<leader>r_", hidden = true },
+        { "<leader>s", group = "[S]earch" },
+        { "<leader>s_", hidden = true },
+        { "<leader>t", group = "[T]oggle" },
+        { "<leader>t_", hidden = true },
+        { "<leader>w", group = "[W]orkspace" },
+        { "<leader>w_", hidden = true },
       }
       -- visual mode
-      require('which-key').register({
-        ['<leader>h'] = { 'Git [H]unk' },
-      }, { mode = 'v' })
+      require('which-key').add(
+        {{ "<leader>h", desc = "Git [H]unk", mode = "v" },}
+      )
     end,
   },
 
@@ -379,6 +386,41 @@ require('lazy').setup({
         return '%2l:%-2v'
       end
 
+      -- Mode -----------------------------------------------------------------------
+      -- Custom `^V` and `^S` symbols to make this file appropriate for copy-paste
+      -- (otherwise those symbols are not displayed).
+      local CTRL_S = vim.api.nvim_replace_termcodes('<C-S>', true, true, true)
+      local CTRL_V = vim.api.nvim_replace_termcodes('<C-V>', true, true, true)
+      -- stylua: ignore start
+      local modes = setmetatable({
+        ['n']    = { long = 'NORMAL',   short = 'N',   hl = 'MiniStatuslineModeNormal' },
+        ['v']    = { long = 'VISUAL',   short = 'V',   hl = 'MiniStatuslineModeVisual' },
+        ['V']    = { long = 'V-LINE',   short = 'V-L', hl = 'MiniStatuslineModeVisual' },
+        [CTRL_V] = { long = 'V-BLOCK',  short = 'V-B', hl = 'MiniStatuslineModeVisual' },
+        ['s']    = { long = 'SELECT',   short = 'S',   hl = 'MiniStatuslineModeVisual' },
+        ['S']    = { long = 'S-LINE',   short = 'S-L', hl = 'MiniStatuslineModeVisual' },
+        [CTRL_S] = { long = 'S-BLOCK',  short = 'S-B', hl = 'MiniStatuslineModeVisual' },
+        ['i']    = { long = 'INSERT',   short = 'I',   hl = 'MiniStatuslineModeInsert' },
+        ['R']    = { long = 'REPLACE',  short = 'R',   hl = 'MiniStatuslineModeReplace' },
+        ['c']    = { long = 'COMMAND',  short = 'C',   hl = 'MiniStatuslineModeCommand' },
+        ['r']    = { long = 'PROMPT',   short = 'P',   hl = 'MiniStatuslineModeOther' },
+        ['!']    = { long = 'SHELL',    short = 'SH',  hl = 'MiniStatuslineModeOther' },
+        ['t']    = { long = 'TERMINAL', short = 'T',   hl = 'MiniStatuslineModeOther' },
+      }, {
+      -- By default return 'Unknown' but this shouldn't be needed
+      __index = function()
+        return   { long = 'Unknown',  short = 'U',   hl = '%#MiniStatuslineModeOther#' }
+      end,
+      })
+      -- stylua: ignore end
+
+      ---@diagnostic disable-next-line: duplicate-set-field
+      statusline.section_mode = function(args)
+        local mode_info = modes[vim.fn.mode()]
+        local mode = statusline.is_truncated(args.trunc_width) and mode_info.short or mode_info.long
+
+        return mode, mode_info.hl
+      end
       -- ... and there is more!
       --  Check out: https://github.com/echasnovski/mini.nvim
     end,
