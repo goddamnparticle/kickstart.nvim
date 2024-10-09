@@ -36,19 +36,20 @@ return { -- Autoformat
     --   }
     -- end,
     formatters_by_ft = {
-      bash = {'bashls'},
+      sh = { 'shellcheck', 'beautysh' },
       lua = { 'cstylua' },
       -- Conform will run multiple formatters sequentially
-      python = { 'isort', 'black' },
+      python = { 'black' },
       -- Use a sub-list to run only the first available formatter
-      javascript = { { 'prettierd', 'prettier' } },
+      javascript = { 'prettierd' },
       -- c formatter
       c = { 'clang_format' },
       -- c++ formatter
       cpp = { 'clang_format' },
       cuda = { 'clang_format' },
       -- cmake formatter
-      cmake = { 'neocmake' },
+      -- cmake = { 'neocmake' },
+      cmake = { 'cmake_format' },
       -- Use the "*" filetype to run formatters on all filetypes.
       ['*'] = { 'codespell' },
       -- Use the "_" filetype to run formatters on filetypes that don't
@@ -56,11 +57,11 @@ return { -- Autoformat
       ['_'] = { 'trim_whitespace' },
     },
     formatters = {
-      neocmake = {
-        command = vim.fn.stdpath 'data' .. '/mason/bin/neocmakelsp',
-        args = { '-F', '$FILENAME' },
-        stdin = true,
-      },
+      -- neocmake = {
+      --   command = vim.fn.stdpath 'data' .. '/mason/bin/neocmakelsp',
+      --   args = { '-F', '$FILENAME' },
+      --   stdin = true,
+      -- },
       cstylua = {
         meta = {
           url = 'https://github.com/JohnnyMorganz/StyLua',
