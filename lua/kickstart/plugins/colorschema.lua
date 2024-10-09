@@ -16,7 +16,10 @@ return {
       -- Enable italic comments.
       italic_comments = true,
       -- Enable general editor background transparency.
-      transparent_bg = true,
+      transparent = {
+        bg = true,
+        float = false
+      },
       -- Enable brighter float border.
       bright_border = true,
       -- Reduce the overall amount of blue in the theme (diverges from base Nord).
