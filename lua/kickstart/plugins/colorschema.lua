@@ -27,21 +27,11 @@ return {
       -- Swap the dark background with the normal one.
       swap_backgrounds = false,
       -- Override the styling of any highlight group.
-      override = {
-        Visual = {
+      on_highlight = function(highlights, palette)
+        highlights.Visual = {
           bg = palette.grey3,
-        },
-        Pmenu = {
-          bg = palette.black0,
-        },
-        PmenuSel = {
-          bg = palette.gray5,
-        },
-        TelescopeBorder = {
-          fg = palette.black2,
-          bg = palette.green.bright,
-        },
-        CmpSel = {
+        }
+        highlights.CmpSel = {
           fg = palette.black2,
           bg = palette.green.bright,
           italic = false,
@@ -49,17 +39,27 @@ return {
           underline = false,
           sp = palette.yellow.dim,
           undercurl = false,
-        },
+        }
+        Pmenu = {
+          bg = palette.black0,
+        }
+        PmenuSel = {
+          bg = palette.gray5,
+        }
+        TelescopeBorder = {
+          fg = palette.black2,
+          bg = palette.green.bright,
+        }
         LspReferenceText = {
           bg = palette.gray1,
-        },
+        }
         LspReferenceWrite = {
           bg = palette.gray1,
-        },
+        }
         LspReferenceRead = {
           bg = palette.gray1,
-        },
-      },
+        }
+      end,
       -- Cursorline options.  Also includes visual/selection.
       cursorline = {
         -- Bold font in cursorline.
