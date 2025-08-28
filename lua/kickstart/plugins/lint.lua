@@ -7,8 +7,18 @@ return {
       local lint = require 'lint'
       lint.linters_by_ft = {
         markdown = { 'markdownlint' },
+        cpp = { 'clangtidy' },
+        c = { 'clangtidy' },
+        python = { 'pylint' },
       }
 
+      local clangtidy = lint.linters.clangtidy
+      clangtidy.args = {
+        '--quiet',
+        '-checks=-*,clang-analyzer-*,-clang-analyzer-cplusplus*',
+        -- Optional: point to your compile_commands.json if it’s not found automatically
+        -- '-p=build',
+      }
       -- To allow other plugins to add linters to require('lint').linters_by_ft,
       -- instead set linters_by_ft like this:
       -- lint.linters_by_ft = lint.linters_by_ft or {}

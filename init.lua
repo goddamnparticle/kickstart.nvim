@@ -91,7 +91,7 @@ vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
 -- Set to true if you have a Nerd Font installed and selected in the terminal
-vim.g.have_nerd_font = false
+vim.g.have_nerd_font = true
 
 -- [[ Setting options ]]
 -- See `:help vim.o`
@@ -150,7 +150,7 @@ vim.o.splitbelow = true
 --   See `:help lua-options`
 --   and `:help lua-options-guide`
 vim.o.list = true
-vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
+vim.opt.listchars = { tab = '  ', trail = '·', nbsp = '␣' }
 
 -- Preview substitutions live, as you type!
 vim.o.inccommand = 'split'
@@ -175,6 +175,7 @@ vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 
 -- Diagnostic keymaps
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
+vim.keymap.set('n', '<leader>,', vim.diagnostic.open_float, { desc = 'Show diagnostic [QE]rror messages' })
 
 -- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
 -- for people to discover. Otherwise, you normally need to press <C-\><C-n>, which
@@ -182,7 +183,7 @@ vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagn
 --
 -- NOTE: This won't work in all terminal emulators/tmux/etc. Try your own mapping
 -- or just use <C-\><C-n> to exit terminal mode
-vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
+-- vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
 
 -- TIP: Disable arrow keys in normal mode
 -- vim.keymap.set('n', '<left>', '<cmd>echo "Use h to move!!"<CR>')
@@ -571,7 +572,8 @@ require('lazy').setup({
           --  Useful when you're not sure what type a variable is and you want to see
           --  the definition of its *type*, not where it was *defined*.
           map('grt', require('telescope.builtin').lsp_type_definitions, '[G]oto [T]ype Definition')
-
+          map('gii', require('telescope.builtin').lsp_incoming_calls, '[S]earch Lsp [I]ncomming Calls')
+          map('goo', require('telescope.builtin').lsp_outgoing_calls, '[S]earch Lsp [O]utgoing Calls')
           -- This function resolves a difference between neovim nightly (version 0.11) and stable (version 0.10)
           ---@param client vim.lsp.Client
           ---@param method vim.lsp.protocol.Method
@@ -634,10 +636,10 @@ require('lazy').setup({
         underline = { severity = vim.diagnostic.severity.ERROR },
         signs = vim.g.have_nerd_font and {
           text = {
-            [vim.diagnostic.severity.ERROR] = '󰅚 ',
-            [vim.diagnostic.severity.WARN] = '󰀪 ',
-            [vim.diagnostic.severity.INFO] = '󰋽 ',
-            [vim.diagnostic.severity.HINT] = '󰌶 ',
+            [vim.diagnostic.severity.ERROR] = 'E',
+            [vim.diagnostic.severity.WARN] = 'W',
+            [vim.diagnostic.severity.INFO] = 'I',
+            [vim.diagnostic.severity.HINT] = 'H ',
           },
         } or {},
         virtual_text = {
@@ -671,9 +673,22 @@ require('lazy').setup({
       --  - settings (table): Override the default settings passed when initializing the server.
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
       local servers = {
-        -- clangd = {},
+        clangd = {
+          cmd = {
+            'clangd',
+            '--background-index',
+            -- by default, clang-tidy use -checks=clang-diagnostic-*,clang-analyzer-*
+            -- to add more checks, create .clang-tidy file in the root directory
+            -- and add Checks key, see https://clang.llvm.org/extra/clang-tidy/
+            '--completion-style=bundled',
+            '--cross-file-rename',
+            '--header-insertion=iwyu',
+            -- make clangd report more logs
+            -- '--log=verbose',
+          },
+        },
         -- gopls = {},
-        -- pyright = {},
+        pyright = {},
         -- rust_analyzer = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
@@ -734,47 +749,6 @@ require('lazy').setup({
         },
       }
     end,
-  },
-
-  { -- Autoformat
-    'stevearc/conform.nvim',
-    event = { 'BufWritePre' },
-    cmd = { 'ConformInfo' },
-    keys = {
-      {
-        '<leader>f',
-        function()
-          require('conform').format { async = true, lsp_format = 'fallback' }
-        end,
-        mode = '',
-        desc = '[F]ormat buffer',
-      },
-    },
-    opts = {
-      notify_on_error = false,
-      format_on_save = function(bufnr)
-        -- Disable "format_on_save lsp_fallback" for languages that don't
-        -- have a well standardized coding style. You can add additional
-        -- languages here or re-enable it for the disabled ones.
-        local disable_filetypes = { c = true, cpp = true }
-        if disable_filetypes[vim.bo[bufnr].filetype] then
-          return nil
-        else
-          return {
-            timeout_ms = 500,
-            lsp_format = 'fallback',
-          }
-        end
-      end,
-      formatters_by_ft = {
-        lua = { 'stylua' },
-        -- Conform can also run multiple formatters sequentially
-        -- python = { "isort", "black" },
-        --
-        -- You can use 'stop_after_first' to run the first available formatter from the list
-        -- javascript = { "prettierd", "prettier", stop_after_first = true },
-      },
-    },
   },
 
   { -- Autocompletion
@@ -850,6 +824,78 @@ require('lazy').setup({
       completion = {
         -- By default, you may press `<c-space>` to show the documentation.
         -- Optionally, set `auto_show = true` to show the documentation after a delay.
+        menu = {
+          max_height = 10,
+          border = 'rounded',
+          draw = {
+            columns = { { 'kind_icon' }, { 'label', 'label_description', gap = 1 } },
+            padding = 1,
+            components = {
+              kind_icon = {
+                ellipsis = false,
+                text = function(ctx)
+                  return ctx.kind_icon .. ctx.icon_gap
+                end,
+                -- Set the highlight priority to 20000 to beat the cursorline's default priority of 10000
+                highlight = function(ctx)
+                  return { { group = ctx.kind_hl, priority = 10000 } }
+                end,
+              },
+              kind = {
+                ellipsis = true,
+                width = { fill = true },
+                text = function(ctx)
+                  return ctx.kind
+                end,
+                highlight = function(ctx)
+                  return ctx.kind_hl
+                end,
+              },
+              label = {
+                width = { fill = true, max = 60 },
+                text = function(ctx)
+                  return ctx.label .. ctx.label_detail
+                end,
+                highlight = function(ctx)
+                  -- label and label details
+                  local highlights = {
+                    { 0, #ctx.label, group = ctx.deprecated and 'BlinkCmpLabelDeprecated' or 'BlinkCmpLabel' },
+                  }
+                  if ctx.label_detail then
+                    table.insert(highlights, { #ctx.label, #ctx.label + #ctx.label_detail, group = 'BlinkCmpLabelDetail' })
+                  end
+                  -- characters matched on the label by the fuzzy matcher
+                  for _, idx in ipairs(ctx.label_matched_indices) do
+                    table.insert(highlights, { idx, idx + 1, group = 'BlinkCmpLabelMatch' })
+                  end
+                  return highlights
+                end,
+              },
+              label_description = {
+                ellipsis = true,
+                width = { max = 30 },
+                text = function(ctx)
+                  return ctx.label_description
+                end,
+                highlight = 'BlinkCmpLabelDescription',
+              },
+              source_name = {
+                width = { max = 30 },
+                text = function(ctx)
+                  return ctx.source_name
+                end,
+                highlight = 'BlinkCmpSource',
+              },
+              source_id = {
+                width = { max = 30 },
+                text = function(ctx)
+                  return ctx.source_id
+                end,
+                highlight = 'BlinkCmpSource',
+              },
+            },
+          },
+        },
         documentation = { auto_show = false, auto_show_delay_ms = 500 },
       },
 
@@ -869,33 +915,11 @@ require('lazy').setup({
       -- the rust implementation via `'prefer_rust_with_warning'`
       --
       -- See :h blink-cmp-config-fuzzy for more information
-      fuzzy = { implementation = 'lua' },
+      fuzzy = { implementation = 'rust' },
 
       -- Shows a signature help window while you type arguments for a function
       signature = { enabled = true },
     },
-  },
-
-  { -- You can easily change to a different colorscheme.
-    -- Change the name of the colorscheme plugin below, and then
-    -- change the command in the config to whatever the name of that colorscheme is.
-    --
-    -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
-    'folke/tokyonight.nvim',
-    priority = 1000, -- Make sure to load this before all the other start plugins.
-    config = function()
-      ---@diagnostic disable-next-line: missing-fields
-      require('tokyonight').setup {
-        styles = {
-          comments = { italic = false }, -- Disable italics in comments
-        },
-      }
-
-      -- Load the colorscheme here.
-      -- Like many other themes, this one has different styles, and you could load
-      -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-      vim.cmd.colorscheme 'tokyonight-night'
-    end,
   },
 
   -- Highlight todo, notes, etc in comments
@@ -934,6 +958,41 @@ require('lazy').setup({
         return '%2l:%-2v'
       end
 
+      -- Mode -----------------------------------------------------------------------
+      -- Custom `^V` and `^S` symbols to make this file appropriate for copy-paste
+      -- (otherwise those symbols are not displayed).
+      local CTRL_S = vim.api.nvim_replace_termcodes('<C-S>', true, true, true)
+      local CTRL_V = vim.api.nvim_replace_termcodes('<C-V>', true, true, true)
+      -- stylua: ignore start
+      local modes = setmetatable({
+        ['n']    = { long = 'NORMAL',   short = 'N',   hl = 'MiniStatuslineModeNormal' },
+        ['v']    = { long = 'VISUAL',   short = 'V',   hl = 'MiniStatuslineModeVisual' },
+        ['V']    = { long = 'V-LINE',   short = 'V-L', hl = 'MiniStatuslineModeVisual' },
+        [CTRL_V] = { long = 'V-BLOCK',  short = 'V-B', hl = 'MiniStatuslineModeVisual' },
+        ['s']    = { long = 'SELECT',   short = 'S',   hl = 'MiniStatuslineModeVisual' },
+        ['S']    = { long = 'S-LINE',   short = 'S-L', hl = 'MiniStatuslineModeVisual' },
+        [CTRL_S] = { long = 'S-BLOCK',  short = 'S-B', hl = 'MiniStatuslineModeVisual' },
+        ['i']    = { long = 'INSERT',   short = 'I',   hl = 'MiniStatuslineModeInsert' },
+        ['R']    = { long = 'REPLACE',  short = 'R',   hl = 'MiniStatuslineModeReplace' },
+        ['c']    = { long = 'COMMAND',  short = 'C',   hl = 'MiniStatuslineModeCommand' },
+        ['r']    = { long = 'PROMPT',   short = 'P',   hl = 'MiniStatuslineModeOther' },
+        ['!']    = { long = 'SHELL',    short = 'SH',  hl = 'MiniStatuslineModeOther' },
+        ['t']    = { long = 'TERMINAL', short = 'T',   hl = 'MiniStatuslineModeOther' },
+      }, {
+      -- By default return 'Unknown' but this shouldn't be needed
+      __index = function()
+        return   { long = 'Unknown',  short = 'U',   hl = '%#MiniStatuslineModeOther#' }
+      end,
+      })
+      -- stylua: ignore end
+
+      ---@diagnostic disable-next-line: duplicate-set-field
+      statusline.section_mode = function(args)
+        local mode_info = modes[vim.fn.mode()]
+        local mode = statusline.is_truncated(args.trunc_width) and mode_info.short or mode_info.long
+
+        return mode, mode_info.hl
+      end
       -- ... and there is more!
       --  Check out: https://github.com/echasnovski/mini.nvim
     end,
@@ -973,12 +1032,14 @@ require('lazy').setup({
   --  Here are some example plugins that I've included in the Kickstart repository.
   --  Uncomment any of the lines below to enable them (you will need to restart nvim).
   --
-  -- require 'kickstart.plugins.debug',
+  require 'kickstart.plugins.debug',
   -- require 'kickstart.plugins.indent_line',
-  -- require 'kickstart.plugins.lint',
-  -- require 'kickstart.plugins.autopairs',
-  -- require 'kickstart.plugins.neo-tree',
-  -- require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
+  require 'kickstart.plugins.lint',
+  require 'kickstart.plugins.autopairs',
+  require 'kickstart.plugins.neo-tree',
+  require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
+  require 'kickstart.plugins.colorschema',
+  require 'kickstart.plugins.conform',
 
   -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
   --    This is the easiest way to modularize your config.
