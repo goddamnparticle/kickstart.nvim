@@ -9,7 +9,7 @@ return {
         markdown = { 'markdownlint' },
         cpp = { 'clangtidy' },
         c = { 'clangtidy' },
-        python = { 'pylint' },
+        python = { 'ruff' },
       }
 
       local clangtidy = lint.linters.clangtidy
