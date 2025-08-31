@@ -158,6 +158,12 @@ vim.o.inccommand = 'split'
 -- Show which line your cursor is on
 vim.o.cursorline = true
 
+-- Set default indentation settings
+-- vim.o.expandtab = true
+-- vim.o.tabstop = 4
+-- vim.o.softtabstop = 4
+-- vim.o.shiftwidth = 4
+
 -- Minimal number of screen lines to keep above and below the cursor.
 vim.o.scrolloff = 10
 
@@ -248,7 +254,12 @@ rtp:prepend(lazypath)
 -- NOTE: Here is where you install your plugins.
 require('lazy').setup({
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
-  'NMAC427/guess-indent.nvim', -- Detect tabstop and shiftwidth automatically
+  {
+    'NMAC427/guess-indent.nvim', -- Detect tabstop and shiftwidth automatically
+    config = function()
+      require('guess-indent').setup {}
+    end,
+  },
 
   -- NOTE: Plugins can also be added by using a table,
   -- with the first argument being the link and the following
@@ -687,9 +698,9 @@ require('lazy').setup({
             -- by default, clang-tidy use -checks=clang-diagnostic-*,clang-analyzer-*
             -- to add more checks, create .clang-tidy file in the root directory
             -- and add Checks key, see https://clang.llvm.org/extra/clang-tidy/
-            '--completion-style=bundled',
-            '--cross-file-rename',
-            '--header-insertion=iwyu',
+            -- '--completion-style=bundled',
+            -- '--cross-file-rename',
+            -- '--header-insertion=iwyu',
             -- make clangd report more logs
             -- '--log=verbose',
           },
