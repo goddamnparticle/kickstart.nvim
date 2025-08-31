@@ -174,8 +174,8 @@ vim.o.confirm = true
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 
 -- Diagnostic keymaps
-vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
-vim.keymap.set('n', '<leader>,', vim.diagnostic.open_float, { desc = 'Show diagnostic [QE]rror messages' })
+vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open Diagnostic Quickfix List' })
+vim.keymap.set('n', '<leader>,', vim.diagnostic.open_float, { desc = 'Show Diagnostic Error Messages' })
 
 -- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
 -- for people to discover. Otherwise, you normally need to press <C-\><C-n>, which
@@ -538,23 +538,23 @@ require('lazy').setup({
 
           -- Rename the variable under your cursor.
           --  Most Language Servers support renaming across files, etc.
-          map(';n', vim.lsp.buf.rename, '[R]e[n]ame')
+          map(';n', vim.lsp.buf.rename, 'Rename')
 
           -- Execute a code action, usually your cursor needs to be on top of an error
           -- or a suggestion from your LSP for this to activate.
-          map(';a', vim.lsp.buf.code_action, '[G]oto Code [A]ction', { 'n', 'x' })
+          map(';a', vim.lsp.buf.code_action, 'Goto Code Action', { 'n', 'x' })
 
           -- Find references for the word under your cursor.
-          map(';r', require('telescope.builtin').lsp_references, '[G]oto [R]eferences')
+          map(';r', require('telescope.builtin').lsp_references, 'Goto References')
 
           -- Jump to the implementation of the word under your cursor.
           --  Useful when your language has ways of declaring types without an actual implementation.
-          map(';i', require('telescope.builtin').lsp_implementations, '[G]oto [I]mplementation')
+          map(';i', require('telescope.builtin').lsp_implementations, 'Goto Implementation')
 
           -- Jump to the definition of the word under your cursor.
           --  This is where a variable was first declared, or where a function is defined, etc.
           --  To jump back, press <C-t>.
-          map(';d', require('telescope.builtin').lsp_definitions, '[G]oto [D]efinition')
+          map(';d', require('telescope.builtin').lsp_definitions, 'Goto Definition')
 
           -- WARN: This is not Goto Definition, this is Goto Declaration.
           --  For example, in C this would take you to the header.
@@ -571,9 +571,9 @@ require('lazy').setup({
           -- Jump to the type of the word under your cursor.
           --  Useful when you're not sure what type a variable is and you want to see
           --  the definition of its *type*, not where it was *defined*.
-          map(';t', require('telescope.builtin').lsp_type_definitions, '[G]oto [T]ype Definition')
-          map(';I', require('telescope.builtin').lsp_incoming_calls, '[S]earch Lsp [I]ncomming Calls')
-          map(';O', require('telescope.builtin').lsp_outgoing_calls, '[S]earch Lsp [O]utgoing Calls')
+          map(';t', require('telescope.builtin').lsp_type_definitions, 'Goto Type Definition')
+          map(';I', require('telescope.builtin').lsp_incoming_calls, 'Search Lsp Incoming Calls')
+          map(';O', require('telescope.builtin').lsp_outgoing_calls, 'Search Lsp Outgoing Calls')
           -- This function resolves a difference between neovim nightly (version 0.11) and stable (version 0.10)
           ---@param client vim.lsp.Client
           ---@param method vim.lsp.protocol.Method
