@@ -68,7 +68,7 @@ return { -- Autoformat
           description = 'An opinionated code formatter for Lua.',
         },
         command = 'stylua',
-        args = { '--indent-width', '2', '--search-parent-directories', '--stdin-filepath', '$FILENAME', '-' },
+        args = { '--indent-width', '2', '--indent-type', 'Spaces', '--search-parent-directories', '--stdin-filepath', '$FILENAME', '-' },
       },
     },
   },
