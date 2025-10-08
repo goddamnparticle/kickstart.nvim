@@ -762,6 +762,9 @@ require('lazy').setup({
         'prettierd',
         'bash-language-server',
         'ruff',
+        'black',
+        'clang-format',
+        'shellcheck',
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
