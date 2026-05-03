@@ -172,7 +172,9 @@ return {
           -- You could adapt this - to for example use the `VIRTUAL_ENV` environment variable.
           local cwd = vim.fn.getcwd()
 
-          if vim.env.CONDA_PREFIX and vim.fn.executable(vim.env.CONDA_PREFIX .. '/bin/python') == 1 then
+          if vim.env.VIRTUAL_ENV and vim.fn.executable(vim.env.VIRTUAL_ENV .. '/bin/python') == 1 then
+            return vim.env.VIRTUAL_ENV .. '/bin/python'
+          elseif vim.env.CONDA_PREFIX and vim.fn.executable(vim.env.CONDA_PREFIX .. '/bin/python') == 1 then
             return vim.env.CONDA_PREFIX .. '/bin/python'
           elseif vim.fn.executable(cwd .. '/venv/bin/python') == 1 then
             return cwd .. '/venv/bin/python'
